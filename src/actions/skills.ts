@@ -1,6 +1,7 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { requireAuth } from '@/lib/require-auth';
 import { SkillSchema, ReorderSchema } from '@/lib/validations';
@@ -10,6 +11,7 @@ import { unstable_cache } from 'next/cache';
 function revalidateAll() {
   revalidatePath('/');
   revalidatePath('/admin/skills');
+  updateTag('skills');
 }
 
 /** Parsea el FormData del formulario de skill */
@@ -40,13 +42,11 @@ export async function createSkill(
       return err('Corregí los errores del formulario', validated.error.flatten().fieldErrors);
     }
 
-    const skill = await prisma.skill.create({
+    await prisma.skill.create({
       data: validated.data,
-      select: { id: true },
     });
 
     revalidateAll();
-    return ok({ id: skill.id });
   } catch (error) {
     if (error instanceof Error && error.message === 'UNAUTHORIZED') {
       return err('No autorizado');
@@ -54,6 +54,7 @@ export async function createSkill(
     console.error('[createSkill]', error);
     return err('Error interno al crear la skill');
   }
+  redirect('/admin/skills');
 }
 
 // ─── UPDATE ──────────────────────────────────────────────────────────────────
@@ -77,7 +78,6 @@ export async function updateSkill(
     });
 
     revalidateAll();
-    return ok();
   } catch (error) {
     if (error instanceof Error && error.message === 'UNAUTHORIZED') {
       return err('No autorizado');
@@ -85,6 +85,7 @@ export async function updateSkill(
     console.error('[updateSkill]', error);
     return err('Error interno al actualizar la skill');
   }
+  redirect('/admin/skills');
 }
 
 // ─── DELETE ──────────────────────────────────────────────────────────────────

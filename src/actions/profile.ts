@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
+import { revalidatePath, updateTag, unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/db';
 import { requireAuth } from '@/lib/require-auth';
 import { ProfileSchema } from '@/lib/validations';
@@ -48,7 +48,7 @@ export async function updateProfile(
 
     revalidatePath('/');
     revalidatePath('/admin/profile');
-    revalidateTag('profile', '');
+    updateTag('profile');
     return ok();
   } catch (error) {
     if (error instanceof Error && error.message === 'UNAUTHORIZED') {

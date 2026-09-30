@@ -1,6 +1,7 @@
 'use server';
 
-import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
+import { revalidatePath, updateTag, unstable_cache } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { requireAuth } from '@/lib/require-auth';
 import { ProjectSchema, ReorderSchema } from '@/lib/validations';
@@ -52,7 +53,7 @@ function revalidateAll() {
   revalidatePath('/');
   revalidatePath('/proyectos');
   revalidatePath('/admin/projects');
-  revalidateTag('projects', '');
+  updateTag('projects');
 }
 
 // ─── CREATE ──────────────────────────────────────────────────────────────────
@@ -84,16 +85,14 @@ export async function createProject(
 
     const tagRecords = await upsertTags(tags);
 
-    const project = await prisma.project.create({
+    await prisma.project.create({
       data: {
         ...projectData,
         tags: { connect: tagRecords },
       },
-      select: { id: true },
     });
 
     revalidateAll();
-    return ok({ id: project.id });
   } catch (error) {
     if (error instanceof Error && error.message === 'UNAUTHORIZED') {
       return err('No autorizado');
@@ -101,6 +100,7 @@ export async function createProject(
     console.error('[createProject]', error);
     return err('Error interno al crear el proyecto');
   }
+  redirect('/admin/projects');
 }
 
 // ─── UPDATE ──────────────────────────────────────────────────────────────────
@@ -145,7 +145,6 @@ export async function updateProject(
     });
 
     revalidateAll();
-    return ok();
   } catch (error) {
     if (error instanceof Error && error.message === 'UNAUTHORIZED') {
       return err('No autorizado');
@@ -153,6 +152,7 @@ export async function updateProject(
     console.error('[updateProject]', error);
     return err('Error interno al actualizar el proyecto');
   }
+  redirect('/admin/projects');
 }
 
 // ─── DELETE ──────────────────────────────────────────────────────────────────
