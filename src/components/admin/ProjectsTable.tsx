@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useTransition, useEffect } from 'react';
+import { useOptimistic, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowUp, ArrowDown, Pencil, Star } from 'lucide-react';
 import { DeleteButton } from './DeleteButton';
@@ -18,13 +18,17 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export function ProjectsTable({ projects: initial }: { projects: ProjectWithTags[] }) {
-  const [projects, setProjects] = useState(initial);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  useEffect(() => {
-    setProjects(initial);
-  }, [initial]);
+  // Lista optimista: muestra el nuevo orden al instante y, cuando termina la
+  // transición, vuelve sola a los datos reales del servidor (`initial`). Si el
+  // action falla, el orden anterior se restaura sin código extra. Reemplaza al
+  // viejo `useState + useEffect(() => setProjects(initial))`.
+  const [projects, setOptimisticProjects] = useOptimistic(
+    initial,
+    (_current, next: ProjectWithTags[]) => next
+  );
 
   function move(index: number, direction: -1 | 1) {
     const targetIndex = index + direction;
@@ -32,16 +36,12 @@ export function ProjectsTable({ projects: initial }: { projects: ProjectWithTags
 
     const reordered = [...projects];
     [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
-    setProjects(reordered);
 
     const payload = reordered.map((p, i) => ({ id: p.id, order: i }));
 
     startTransition(async () => {
-      const result = await reorderProjects(JSON.stringify(payload));
-      if (!result.success) {
-        // revertir en caso de error
-        setProjects(initial);
-      }
+      setOptimisticProjects(reordered);
+      await reorderProjects(JSON.stringify(payload));
       router.refresh();
     });
   }

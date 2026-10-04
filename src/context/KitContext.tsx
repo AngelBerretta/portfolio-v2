@@ -2,9 +2,10 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
-  useEffect,
-  useState,
+  useMemo,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -29,49 +30,69 @@ const KitContext = createContext<KitContextValue>({
   mounted: false,
 });
 
+// La fuente de verdad del kit es el atributo data-kit de <html>. Lo deja
+// puesto el script anti-flash del layout ANTES de hidratar, y acá solo lo
+// leemos / escribimos. useSyncExternalStore existe justo para esto: leer un
+// valor externo sin el patrón "useEffect + setState" (que dispara un render
+// extra y el lint de React marca como error).
+
+function subscribe(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-kit"],
+  });
+  return () => observer.disconnect();
+}
+
+function getSnapshot(): Kit {
+  return document.documentElement.getAttribute("data-kit") === "home" ? "home" : "away";
+}
+
+// Servidor y primer render de hidratación: SIEMPRE 'away', así server y
+// cliente coinciden; React corrige solo después si el kit real es 'home'.
+function getServerSnapshot(): Kit {
+  return "away";
+}
+
+const subscribeNoop = () => () => {};
+
 export function KitProvider({ children }: { children: ReactNode }) {
-  // Arrancamos SIEMPRE con 'away' para que server y cliente coincidan
-  const [kit, setKitState] = useState<Kit>("away");
-  const [mounted, setMounted] = useState(false);
+  const kit = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  // Después de montar, leemos el valor real del DOM
-  useEffect(() => {
-    const attr = document.documentElement.getAttribute("data-kit");
-    const initial: Kit = attr === "home" ? "home" : "away";
-    setKitState(initial);
-    setMounted(true);
-  }, []);
+  // false en servidor / hidratación, true una vez en el cliente.
+  const mounted = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false
+  );
 
-  // Sincronizamos DOM y localStorage cuando cambia el kit (post-mount)
-  useEffect(() => {
-    if (!mounted) return;
-    const root = document.documentElement;
-    root.setAttribute("data-kit", kit);
+  const setKit = useCallback((next: Kit) => {
+    document.documentElement.setAttribute("data-kit", next);
     try {
-      localStorage.setItem("portfolio-kit", kit);
+      localStorage.setItem("portfolio-kit", next);
     } catch {
       // ignoramos
     }
-  }, [kit, mounted]);
+  }, []);
 
-  const setKit = (next: Kit) => setKitState(next);
-  const toggleKit = () =>
-    setKitState((current) => (current === "away" ? "home" : "away"));
+  const toggleKit = useCallback(() => {
+    setKit(getSnapshot() === "away" ? "home" : "away");
+  }, [setKit]);
 
-  return (
-    <KitContext.Provider
-      value={{
-        kit,
-        toggleKit,
-        setKit,
-        isHome: kit === "home",
-        isAway: kit === "away",
-        mounted,
-      }}
-    >
-      {children}
-    </KitContext.Provider>
+  const value = useMemo<KitContextValue>(
+    () => ({
+      kit,
+      toggleKit,
+      setKit,
+      isHome: kit === "home",
+      isAway: kit === "away",
+      mounted,
+    }),
+    [kit, toggleKit, setKit, mounted]
   );
+
+  return <KitContext.Provider value={value}>{children}</KitContext.Provider>;
 }
 
 export const useKit = () => useContext(KitContext);
