@@ -1,0 +1,63 @@
+/* Menú mobile del Navbar.
+   El layout y las transiciones viven acá; los colores salen de los tokens
+   de globals.css, así que cambian solos con el kit home / away. */
+
+.nav-mobile {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  visibility: hidden;
+  pointer-events: none;
+  /* visibility se retrasa al cerrar para que se vea la animación de salida */
+  transition: visibility 0s linear 0.3s;
+}
+
+.nav-mobile[data-open="true"] {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.nav-mobile__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.6);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-mobile[data-open="true"] .nav-mobile__backdrop {
+  opacity: 1;
+}
+
+.nav-mobile__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: min(20rem, 85vw);
+  height: 100dvh;
+  padding: 1.25rem;
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  background: var(--color-bg-secondary);
+  border-left: 1px solid var(--color-border-subtle);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow-y: auto;
+}
+
+.nav-mobile[data-open="true"] .nav-mobile__panel {
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-mobile,
+  .nav-mobile__backdrop,
+  .nav-mobile__panel {
+    transition: none;
+  }
+}

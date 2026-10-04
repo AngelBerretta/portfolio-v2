@@ -70,11 +70,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="es"
-      data-kit="away"
-      suppressHydrationWarning
-    >
+    <html lang="es" data-kit="away" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: kitScript }} />
       </head>
