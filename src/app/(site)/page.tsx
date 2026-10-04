@@ -5,7 +5,10 @@
 // (src/actions/profile.ts) y pasá `avatarUrl={profile?.avatarUrl}`. Ojo con
 // cacheComponents: hacelo dentro de un <Suspense> o con datos cacheados.
 
+import { Suspense } from 'react';
 import { HeroSection } from '@/components/hero/HeroSection';
+import { SquadSection } from '@/components/squad/SquadSection';
+import { SquadSkeleton } from '@/components/squad/SquadSkeleton';
 
 const PLACEHOLDER_SECTIONS = [
   { id: 'about', title: 'Sobre mí' },
@@ -19,15 +22,23 @@ export default function HomePage() {
     <>
       <HeroSection avatarUrl="/images/avatar.jpg" />
 
-      {PLACEHOLDER_SECTIONS.map(({ id, title }) => (
-        <section
-          key={id}
-          id={id}
-          className="flex min-h-dvh items-center justify-center border-b border-border-subtle px-6"
-        >
-          <h2 className="font-display text-4xl font-bold md:text-6xl">{title}</h2>
-        </section>
-      ))}
+      {PLACEHOLDER_SECTIONS.map(({ id, title }) =>
+        id === 'skills' ? (
+          <Suspense key={id} fallback={<SquadSkeleton />}>
+            <SquadSection />
+          </Suspense>
+        ) : (
+          <section
+            key={id}
+            id={id}
+            className="flex min-h-dvh items-center justify-center border-b border-border-subtle px-6"
+          >
+            <h2 className="font-display text-4xl font-bold md:text-6xl">
+              {title}
+            </h2>
+          </section>
+        )
+      )}
     </>
   );
 }
