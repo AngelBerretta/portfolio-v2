@@ -54,6 +54,7 @@ async function EditSkillContent({ params }: { params: Promise<{ id: string }> })
     skill.iconUrl,
     skill.iconName,
     skill.invertIcon,
+    skill.level,
   ]);
 
   return (

@@ -24,6 +24,7 @@ export function SkillForm<T = undefined>({
   const [description, setDescription] = useState(skill?.description ?? '');
   const [category, setCategory] = useState(skill?.category ?? 'frontend');
   const [order, setOrder] = useState(skill?.order ?? 0);
+  const [level, setLevel] = useState(skill?.level ?? 50);
 
   const [iconType, setIconType] = useState<'url' | 'lucide'>(
     skill?.iconName ? 'lucide' : 'url'
@@ -101,6 +102,28 @@ export function SkillForm<T = undefined>({
           />
         </Field>
       </div>
+
+      <Field
+        label="Nivel"
+        hint="0–100. Define cuánto se llena la barra."
+        error={fieldErrors?.level?.[0]}
+      >
+        <div className="flex items-center gap-3">
+          <input
+            name="level"
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={level}
+            onChange={(e) => setLevel(Number(e.target.value))}
+            className="flex-1 accent-blue-600"
+          />
+          <span className="w-10 text-right font-mono text-sm text-gray-300">
+            {level}
+          </span>
+        </div>
+      </Field>
 
       <div className="space-y-3 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
         <p className="text-sm font-medium text-gray-300">Ícono</p>
