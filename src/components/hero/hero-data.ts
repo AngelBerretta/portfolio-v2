@@ -1,4 +1,5 @@
 // hero-data.ts — todo el contenido editable del hero en un solo lugar.
+// (Los datos de la carta de jugador pasaron a about/player-data.ts.)
 
 /** Roles que escribe el typewriter. Constante de módulo = identidad estable. */
 export const ROLES = [
@@ -18,32 +19,10 @@ export interface HeroStat {
   label: string;
 }
 
-/** Valores por defecto. En la fase 11 se pueden pasar reales desde la DB
- *  (ej: cantidad de proyectos y skills) vía la prop `stats` de HeroSection. */
+/** Valores por defecto. page.tsx los pisa con los reales de la DB
+ *  (cantidad de proyectos online y de tecnologías) cuando hay datos. */
 export const HERO_STATS: HeroStat[] = [
   { value: '8+', label: 'Proyectos' },
   { value: '1+', label: 'Año freelance' },
   { value: '20+', label: 'Tecnologías' },
 ];
-
-export interface PlayerAttribute {
-  label: string;
-  value: number;
-}
-
-/** Datos de la carta de jugador.
- *  OJO: los números son una autoevaluación de EJEMPLO — editalos a gusto.
- *  La puntuación general (la cifra grande) se calcula sola como el promedio. */
-export const PLAYER = {
-  name: 'Angel Berretta',
-  position: 'FS',
-  title: 'Full Stack Developer',
-  attributes: [
-    { label: 'Frontend', value: 88 },
-    { label: 'Backend', value: 76 },
-    { label: 'UI / UX', value: 80 },
-    { label: 'Bases de datos', value: 72 },
-    { label: 'Aprendizaje', value: 92 },
-    { label: 'Compromiso', value: 90 },
-  ] satisfies PlayerAttribute[],
-};

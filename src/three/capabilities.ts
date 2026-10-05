@@ -13,8 +13,15 @@ export function canRender3D(): boolean {
 
   const nav = navigator as NavigatorExtras;
   if (nav.connection?.saveData) return false; // "Ahorro de datos" activado
-  if (typeof nav.hardwareConcurrency === 'number' && nav.hardwareConcurrency < 4) return false;
-  if (typeof nav.deviceMemory === 'number' && nav.deviceMemory < 4) return false;
+
+  // Equipos con muy poca memoria. (Chrome reporta 0.25, 0.5, 1, 2, 4 u 8.)
+  if (typeof nav.deviceMemory === 'number' && nav.deviceMemory < 2) return false;
+
+  // OJO: acá antes se descartaba con hardwareConcurrency < 4. Se sacó porque
+  // Brave, Firefox (protección anti-rastreo) y otros devuelven 2 a propósito
+  // para evitar el fingerprinting, y dejaban sin 3D a equipos potentes. En
+  // desktop, el balón además pausa su render fuera de pantalla y useBallScene
+  // baja la resolución si los FPS caen.
 
   try {
     const canvas = document.createElement('canvas');

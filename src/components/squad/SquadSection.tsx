@@ -1,5 +1,6 @@
 import { getSkillsByCategory } from '@/actions/skills';
 import { SectionHeading } from '@/components/shared/SectionHeading';
+import { Reveal } from '@/components/shared/Reveal';
 import { PositionGroup } from './PositionGroup';
 import type { PositionGroupData, SkillCategoryId } from './types';
 
@@ -62,7 +63,6 @@ export async function SquadSection() {
       id: s.id,
       name: s.name,
       description: s.description ?? '',
-      level: s.level,
       iconUrl: s.iconUrl,
       iconName: s.iconName,
       invertIcon: s.invertIcon,
@@ -89,8 +89,10 @@ export async function SquadSection() {
 
         {groups.length > 0 ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {groups.map((group) => (
-              <PositionGroup key={group.id} group={group} />
+            {groups.map((group, i) => (
+              <Reveal key={group.id} delay={i * 0.1} className="h-full">
+                <PositionGroup group={group} />
+              </Reveal>
             ))}
           </div>
         ) : (

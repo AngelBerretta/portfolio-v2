@@ -3,27 +3,16 @@
 import { useId, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/utils/cn';
-import { useStatBarFill } from '@/animations/useStatBarFill';
 import { SkillIcon } from './SkillIcon';
 import type { SquadSkill } from './types';
 
 /**
- * Una fila de skill: ícono, nombre, nivel y barra.
- *
- * - La barra y el número se animan al entrar en viewport (useStatBarFill).
- *   El `width` inline ya es el valor final, así que con reduced-motion o sin
- *   JS la barra se ve correcta y simplemente no se anima.
- * - Si la skill tiene descripción, la fila es un botón que la despliega.
- *   Es la única interacción de la sección: así las tarjetas se mantienen
- *   compactas y la descripción sigue en el DOM (SEO, lectores de pantalla).
+ * Una fila de tecnología: ícono y nombre. Si tiene descripción, la fila es un
+ * botón que la despliega: es la única interacción de la sección, así las
+ * tarjetas se mantienen compactas y la descripción sigue en el DOM (SEO,
+ * lectores de pantalla).
  */
-export function SkillStatBar({ skill, index }: { skill: SquadSkill; index: number }) {
-  const level = Math.round(Math.min(100, Math.max(0, skill.level)));
-
-  // El delay por índice solo se nota cuando varias barras entran juntas;
-  // lo topamos para que las de más abajo no lleguen tarde al scrollear.
-  const { barRef, valueRef } = useStatBarFill(level, { delay: Math.min(index, 5) * 0.06 });
-
+export function SkillRow({ skill }: { skill: SquadSkill }) {
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const hasDescription = skill.description.length > 0;
@@ -34,11 +23,6 @@ export function SkillStatBar({ skill, index }: { skill: SquadSkill; index: numbe
         <SkillIcon skill={skill} />
       </span>
       <span className="min-w-0 flex-1 truncate font-mono text-sm font-medium">{skill.name}</span>
-      <span className="font-display text-lg font-bold tabular-nums text-accent">
-        <span className="sr-only">Nivel </span>
-        {/* valueRef: useStatBarFill reescribe este nodo de texto al contar 0 → nivel */}
-        <span ref={valueRef}>{level}</span>
-      </span>
       {hasDescription && (
         <ChevronDown
           className={cn(
@@ -52,7 +36,7 @@ export function SkillStatBar({ skill, index }: { skill: SquadSkill; index: numbe
   );
 
   return (
-    <li>
+    <li className="py-3 first:pt-0 last:pb-0">
       {hasDescription ? (
         <button
           type="button"
@@ -66,14 +50,6 @@ export function SkillStatBar({ skill, index }: { skill: SquadSkill; index: numbe
       ) : (
         <div className="flex items-center gap-3 text-text-primary">{row}</div>
       )}
-
-      <div aria-hidden="true" className="mt-2 h-1.5 overflow-hidden rounded-full bg-bg-elevated">
-        <div
-          ref={barRef}
-          className="h-full rounded-full bg-accent"
-          style={{ width: `${level}%` }}
-        />
-      </div>
 
       {hasDescription && (
         // grid-rows 0fr → 1fr anima la altura sin medirla ni usar una librería.

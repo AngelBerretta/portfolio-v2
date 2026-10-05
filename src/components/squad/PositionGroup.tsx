@@ -1,10 +1,10 @@
 import { cn } from '@/utils/cn';
-import { SkillStatBar } from './SkillStatBar';
+import { SkillRow } from './SkillRow';
 import type { PositionGroupData } from './types';
 
 /**
  * Tarjeta de un grupo de skills. Server component: solo las filas
- * (SkillStatBar) son islas cliente.
+ * (SkillRow) son islas cliente.
  *
  * Jerarquía a propósito: el título en lenguaje llano ("Frontend") es lo
  * primero que se lee; la posición ("Delanteros") es una etiqueta chica y la
@@ -38,9 +38,9 @@ export function PositionGroup({ group }: { group: PositionGroupData }) {
         <p className="mt-1 text-sm leading-relaxed text-text-secondary">{group.hint}</p>
       </header>
 
-      <ul className="space-y-5">
-        {group.skills.map((skill, i) => (
-          <SkillStatBar key={skill.id} skill={skill} index={i} />
+      <ul className="divide-y divide-border-subtle">
+        {group.skills.map((skill) => (
+          <SkillRow key={skill.id} skill={skill} />
         ))}
       </ul>
     </section>

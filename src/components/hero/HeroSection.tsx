@@ -4,15 +4,14 @@ import { ArrowDown, Mail } from 'lucide-react';
 import { Badge } from '@/components/shared/Badge';
 import { ArgentinaFlag, GitHubIcon, LinkedInIcon } from '@/components/shared/icons';
 import { BallStage } from './BallStage';
-import { PlayerCard } from './PlayerCard';
 import { StatsHUD } from './StatsHUD';
 import { TypedRole } from './TypedRole';
 import { HERO_STATS, ROLES, SOCIAL_LINKS, type HeroStat } from './hero-data';
 
 // Se renderiza en el SERVIDOR: el h1, el texto y los CTAs llegan en el HTML
-// inicial (buen LCP, sin esperar hidratación). Solo TypedRole, PlayerCard y
-// BallStage son islas cliente. La entrada animada es CSS puro (.hero-intro,
-// ver globals.css): sin parpadeo y sin depender de JS.
+// inicial (buen LCP, sin esperar hidratación). Solo TypedRole y BallStage son
+// islas cliente. La entrada animada es CSS puro (.hero-intro, ver globals.css):
+// sin parpadeo y sin depender de JS.
 
 const SOCIAL_ICONS = {
   github: <GitHubIcon />,
@@ -29,14 +28,7 @@ const outlineLink =
 const iconLink =
   'inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-text-secondary transition-colors duration-200 hover:border-accent hover:text-accent';
 
-export function HeroSection({
-  avatarUrl,
-  stats = HERO_STATS,
-}: {
-  /** Foto de perfil (Profile.avatarUrl). Sin ella la carta muestra iniciales. */
-  avatarUrl?: string | null;
-  stats?: HeroStat[];
-}) {
+export function HeroSection({ stats = HERO_STATS }: { stats?: HeroStat[] }) {
   return (
     <section
       id="hero"
@@ -46,7 +38,7 @@ export function HeroSection({
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-y-0 left-1/2 w-px bg-border-ghost" />
         <div className="absolute left-1/2 top-1/2 hidden h-[44rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border-ghost sm:block" />
-        <div className="absolute right-[6%] top-1/4 h-96 w-96 rounded-full bg-accent-ghost blur-3xl" />
+        <div className="absolute right-[6%] top-1/4 h-[28rem] w-[28rem] rounded-full bg-accent-ghost blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8">
@@ -95,10 +87,7 @@ export function HeroSection({
             </Link>
           </div>
 
-          <ul
-            className="hero-intro mt-8 flex items-center gap-3"
-            style={delay(0.4)}
-          >
+          <ul className="hero-intro mt-8 flex items-center gap-3" style={delay(0.4)}>
             {SOCIAL_LINKS.map((s) => (
               <li key={s.id}>
                 <a
@@ -115,13 +104,15 @@ export function HeroSection({
           </ul>
         </div>
 
-        {/* ── Carta + balón ─────────────────────────────────── */}
+        {/* ── Balón ─────────────────────────────────────────────
+            Solo desde lg (donde el hero pasa a dos columnas). Por debajo queda
+            oculto con display:none, y BallStage no descarga three.js hasta que
+            el balón entra en pantalla, así que en mobile no cuesta nada. */}
         <div
-          className="hero-intro relative mx-auto w-full max-w-[19rem] sm:max-w-sm"
+          className="hero-intro hidden items-center justify-center lg:flex"
           style={delay(0.3)}
         >
-          <PlayerCard avatarUrl={avatarUrl} />
-          <BallStage className="pointer-events-none absolute -right-6 -top-12 z-20 h-36 w-36 sm:-right-12 sm:-top-14 sm:h-52 sm:w-52" />
+          <BallStage className="pointer-events-none aspect-square w-full max-w-[26rem] xl:max-w-[30rem]" />
         </div>
       </div>
 
