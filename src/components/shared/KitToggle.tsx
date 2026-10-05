@@ -8,15 +8,21 @@ interface KitToggleProps {
   className?: string;
 }
 
+const KIT_LABEL = { home: "Local", away: "Visitante" } as const;
+
 export function KitToggle({ className }: KitToggleProps) {
   const { kit, toggleKit } = useKit();
+  const next = kit === "home" ? "away" : "home";
 
   return (
     <button
       type="button"
       onClick={toggleKit}
-      aria-label={`Cambiar a kit ${kit === "home" ? "away" : "home"}`}
-      title={`Kit actual: ${kit === "home" ? "Local" : "Visitante"}`}
+      // El texto visible es "Local" / "Visitante": el aria-label usa las mismas
+      // palabras (antes decía "kit away/home") para que lectores de pantalla y
+      // quien usa control por voz oigan lo mismo que ven.
+      aria-label={`Cambiar al kit ${KIT_LABEL[next].toLowerCase()}`}
+      title={`Kit actual: ${KIT_LABEL[kit]}`}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-full",
         "h-10 px-4 text-sm font-medium",
@@ -28,10 +34,8 @@ export function KitToggle({ className }: KitToggleProps) {
         className
       )}
     >
-      <Shirt className="h-4 w-4" />
-      <span className="hidden sm:inline">
-        {kit === "home" ? "Local" : "Visitante"}
-      </span>
+      <Shirt className="h-4 w-4" aria-hidden="true" />
+      <span className="hidden sm:inline">{KIT_LABEL[kit]}</span>
     </button>
   );
 }
