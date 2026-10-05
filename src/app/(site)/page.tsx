@@ -1,44 +1,89 @@
-// TEMPORAL — el hero ya es real; el resto sigue siendo placeholder hasta las
-// fases 7–10. En la fase 11 se reemplaza por el ensamblado final.
-//
-// Para mostrar la foto real en la carta: traé el perfil con getProfile()
-// (src/actions/profile.ts) y pasá `avatarUrl={profile?.avatarUrl}`. Ojo con
-// cacheComponents: hacelo dentro de un <Suspense> o con datos cacheados.
-
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { getAllProjects } from '@/actions/projects';
+import { getAllSkills } from '@/actions/skills';
 import { HeroSection } from '@/components/hero/HeroSection';
+import { HERO_STATS, SOCIAL_LINKS } from '@/components/hero/hero-data';
+import { AboutSection } from '@/components/about/AboutSection';
+import { AboutSkeleton } from '@/components/about/AboutSkeleton';
 import { SquadSection } from '@/components/squad/SquadSection';
 import { SquadSkeleton } from '@/components/squad/SquadSkeleton';
+import { MatchesSection } from '@/components/matches/MatchesSection';
+import { MatchesSkeleton } from '@/components/matches/MatchesSkeleton';
+import { mapProjectsToCardData, splitLiveUpcoming } from '@/components/matches/mapProjects';
+import { TransferSection } from '@/components/transfer/TransferSection';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
 
-const PLACEHOLDER_SECTIONS = [
-  { id: 'about', title: 'Sobre mí' },
-  { id: 'skills', title: 'Plantel' },
-  { id: 'projects', title: 'Partidos' },
-  { id: 'contact', title: 'Fichaje' },
-] as const;
+// Título, descripción y Open Graph los hereda del layout raíz.
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
+
+// Datos estructurados para buscadores (schema.org/Person).
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE_NAME,
+  jobTitle: 'Full Stack Developer',
+  url: SITE_URL,
+  sameAs: SOCIAL_LINKS.filter((s) => s.external).map((s) => s.href),
+  knowsAbout: ['React', 'TypeScript', 'Node.js', 'Firebase', 'MongoDB'],
+};
+
+/**
+ * Hero con cifras reales: cuenta proyectos online y tecnologías en la DB (las
+ * mismas queries cacheadas que usan las otras secciones, así que no suma
+ * consultas). Si una cifra da 0, queda la de hero-data.ts.
+ */
+async function HeroWithData() {
+  const [projects, skills] = await Promise.all([getAllProjects(), getAllSkills()]);
+
+  const { live } = splitLiveUpcoming(mapProjectsToCardData(projects));
+
+  // Las claves deben coincidir con los `label` de HERO_STATS.
+  const counts: Record<string, number> = {
+    Proyectos: live.length,
+    'Tecnologías': skills.length,
+  };
+
+  const stats = HERO_STATS.map((stat) => {
+    const count = counts[stat.label] ?? 0;
+    return count > 0 ? { ...stat, value: String(count) } : stat;
+  });
+
+  return <HeroSection stats={stats} />;
+}
 
 export default function HomePage() {
   return (
     <>
-      <HeroSection avatarUrl="/images/avatar.jpg" />
+      <script
+        type="application/ld+json"
+        // `<` escapado para que ningún valor pueda cerrar el <script>.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personJsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
 
-      {PLACEHOLDER_SECTIONS.map(({ id, title }) =>
-        id === 'skills' ? (
-          <Suspense key={id} fallback={<SquadSkeleton />}>
-            <SquadSection />
-          </Suspense>
-        ) : (
-          <section
-            key={id}
-            id={id}
-            className="flex min-h-dvh items-center justify-center border-b border-border-subtle px-6"
-          >
-            <h2 className="font-display text-4xl font-bold md:text-6xl">
-              {title}
-            </h2>
-          </section>
-        )
-      )}
+      {/* El fallback es el mismo hero con los valores por defecto: si los datos
+          tardan, la página no salta ni queda un hueco. */}
+      <Suspense fallback={<HeroSection />}>
+        <HeroWithData />
+      </Suspense>
+
+      <Suspense fallback={<AboutSkeleton />}>
+        <AboutSection />
+      </Suspense>
+
+      <Suspense fallback={<SquadSkeleton />}>
+        <SquadSection />
+      </Suspense>
+
+      <Suspense fallback={<MatchesSkeleton />}>
+        <MatchesSection variant="home" />
+      </Suspense>
+
+      <TransferSection />
     </>
   );
 }

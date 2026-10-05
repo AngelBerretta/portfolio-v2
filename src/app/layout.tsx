@@ -1,7 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { KitProvider } from "@/context/KitContext";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+  buildOpenGraph,
+} from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,34 +25,43 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Angel Berretta — Full Stack Developer",
-  description:
-    "Portfolio de Angel Berretta, Desarrollador Full Stack Freelance. Especializado en React, Node.js, Firebase y más.",
+  // Base para resolver URLs relativas (imágenes OG, canonical) a absolutas.
+  metadataBase: new URL(SITE_URL),
+  // Las páginas definen solo su parte: title: "Proyectos" → "Proyectos | Angel Berretta".
+  title: { default: SITE_TITLE, template: `%s | ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   keywords: [
     "Angel Berretta",
     "desarrollador full stack",
     "portfolio",
     "React",
+    "Next.js",
     "JavaScript",
+    "TypeScript",
     "Node.js",
     "Firebase",
     "freelance",
   ],
-  authors: [{ name: "Angel Berretta" }],
-  openGraph: {
-    title: "Angel Berretta — Full Stack Developer",
-    description:
-      "Portfolio de Angel Berretta, Desarrollador Full Stack Freelance. React, Node.js, Firebase y más.",
-    type: "website",
-  },
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  openGraph: buildOpenGraph({ title: SITE_TITLE, description: SITE_DESCRIPTION }),
+  // La imagen sale de app/twitter-image.tsx.
   twitter: {
     card: "summary_large_image",
-    title: "Angel Berretta — Full Stack Developer",
-    description: "Portfolio de Angel Berretta, Desarrollador Full Stack Freelance.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   icons: {
     icon: "/favicon.svg",
   },
+};
+
+// Los dos kits (home / away) son oscuros, así que el color de la barra del
+// navegador móvil y de los controles nativos queda fijo en el del kit away.
+export const viewport: Viewport = {
+  themeColor: "#080808",
+  colorScheme: "dark",
 };
 
 /**
