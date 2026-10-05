@@ -24,8 +24,16 @@ export const metadata: Metadata = {
 
 export default function PartidosPage() {
   return (
-    <Suspense fallback={<MatchesSkeleton />}>
-      <MatchesSection variant="page" />
-    </Suspense>
+    <>
+      {/* Esta página no tenía <h1>: el primer encabezado visible es el h2 de
+          MatchesSection. Se agrega uno oculto (en vez de convertir ese h2)
+          para no saltar de h1 a h3 en las tarjetas. Va fuera del Suspense
+          para que esté en el HTML inicial. */}
+      <h1 className="sr-only">Proyectos de Angel Berretta</h1>
+
+      <Suspense fallback={<MatchesSkeleton />}>
+        <MatchesSection variant="page" />
+      </Suspense>
+    </>
   );
 }

@@ -4,6 +4,9 @@
    DESIGN TOKENS — Portfolio "kit" home / away
    Tailwind 4 usa @theme para exponer tokens como utilidades.
    Los valores se cambian por data-kit="home" | "away" en <html>.
+
+   Contraste (WCAG AA): texto normal ≥ 4.5:1, bordes de controles ≥ 3:1.
+   Los valores de abajo están verificados contra bg-body / bg-card.
    ================================================================ */
 
 @theme {
@@ -34,10 +37,14 @@
   --color-border: #2e2e2e;
   --color-border-subtle: #222222;
   --color-border-ghost: #1a1a1a;
+  /* Contorno de controles de formulario (inputs): necesita ≥ 3:1 (WCAG 1.4.11).
+     --color-border queda para separadores decorativos. */
+  --color-border-strong: #6b6b6b;
 
   --color-text-primary: #f5f5f5;
-  --color-text-secondary: #999999;
-  --color-text-muted: #b8b8b8;
+  /* Antes secondary/muted estaban invertidos (muted era más claro). */
+  --color-text-secondary: #b8b8b8;
+  --color-text-muted: #999999;
   --color-text-disabled: #333333;
   --color-text-inverse: #0a0a0a;
 
@@ -53,7 +60,7 @@
   --color-pos-continental: #06b6d4;
   --color-pos-playoff: #f59e0b;
   --color-pos-repechaje: #eab308;
-  --color-pos-champions-playoff: #8b5cf6;
+  --color-pos-champions-playoff: #a78bfa; /* era #8b5cf6 (4.35:1) */
   --color-pos-continental-playoff: #ec4899;
   --color-pos-relegation-playoff: #ea580c;
   --color-pos-relegation: #ef4444;
@@ -70,14 +77,18 @@
   --color-bg-elevated: #234134;
   --color-bg-surface: #234134;
 
-  --color-accent: #6faa54;
-  --color-accent-dim: #018000;
-  --color-accent-ghost: rgba(111, 170, 84, 0.13);
-  --color-accent-text: #6faa54;
+  /* accent era #6faa54 (4.0:1 sobre body). Ahora 5.2:1. */
+  --color-accent: #86c068;
+  /* Hover de botones primarios: más CLARO (antes #018000, 2.97:1 con texto
+     oscuro). Con #9bd17d el contraste con text-inverse es 8.6:1. */
+  --color-accent-dim: #9bd17d;
+  --color-accent-ghost: rgba(134, 192, 104, 0.13);
+  --color-accent-text: #86c068;
 
   --color-border: #60756c;
   --color-border-subtle: rgba(255, 255, 255, 0.2);
   --color-border-ghost: rgba(255, 255, 255, 0.05);
+  --color-border-strong: #8a9d94;
 
   --color-text-primary: #ffffff;
   --color-text-secondary: rgba(255, 255, 255, 0.7);
@@ -85,20 +96,20 @@
   --color-text-disabled: rgba(255, 255, 255, 0.2);
   --color-text-inverse: #0a2b1d;
 
-  --color-live: #ff4848;
-  --color-live-bg: rgba(255, 72, 72, 0.07);
-  --color-win: #6faa54;
-  --color-loss: #ff4848;
+  --color-live: #ff8585; /* era #ff4848 (3.9:1) */
+  --color-live-bg: rgba(255, 133, 133, 0.07);
+  --color-win: #86c068;
+  --color-loss: #ff8585;
   --color-draw: #60756c;
 
-  --color-pos-champions: #3b82f6;
+  --color-pos-champions: #7ab4fb; /* era #3b82f6 (3.6:1 sobre card) */
   --color-pos-continental: #06b6d4;
   --color-pos-playoff: #ffc61a;
   --color-pos-repechaje: #ffd43b;
   --color-pos-champions-playoff: #a78bfa;
   --color-pos-continental-playoff: #f472b6;
-  --color-pos-relegation-playoff: #fb6514;
-  --color-pos-relegation: #ff4848;
+  --color-pos-relegation-playoff: #ff8a4c; /* era #fb6514 (4.4:1) */
+  --color-pos-relegation: #ff8585;
 }
 
 /* ================================================================
@@ -152,5 +163,25 @@ section[id] {
   .hero-intro {
     animation: hero-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--hero-delay, 0s);
+  }
+}
+
+/* ================================================================
+   REDUCED MOTION — red de seguridad global
+   Las transiciones/animaciones de Tailwind (hover:-translate-y-1,
+   group-hover:scale-105, animate-pulse de los skeletons, slide del SideNav,
+   etc.) no se apagan solas con prefers-reduced-motion. Esto las neutraliza
+   sin tener que prefijar cada clase con motion-safe:.
+   GSAP no se ve afectado: ya se protege con gsap.matchMedia(MOTION_OK).
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

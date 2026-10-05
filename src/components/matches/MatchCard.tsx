@@ -35,8 +35,6 @@ export function MatchCard({ project, index }: { project: ProjectCardData; index:
   const isComingSoon = project.status === 'coming-soon';
   const FooterIcon = isComingSoon ? Clock : Hammer;
 
-  const isPriority = index < 3;
-
   return (
     <article
       ref={ref}
@@ -49,14 +47,16 @@ export function MatchCard({ project, index }: { project: ProjectCardData; index:
       {/* ── Media ───────────────────────────────────────── */}
       {hasImage ? (
         <div className="relative aspect-video overflow-hidden bg-bg-surface">
+          {/* Sin `priority`: las cards nunca son el LCP (en el home están bajo
+              el hero y arrancan con opacity 0 por el reveal), y precargarlas
+              competía con el recurso que sí importa. next/image ya las carga
+              en lazy. */}
           <Image
             src={project.image}
             alt={`Captura de ${project.title}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-            priority={isPriority}
-            loading={isPriority ? undefined : 'lazy'}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 

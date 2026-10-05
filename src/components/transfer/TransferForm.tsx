@@ -23,8 +23,11 @@ type FieldName = 'name' | 'email' | 'subject' | 'message';
 const EMPTY: Record<FieldName, string> = { name: '', email: '', subject: '', message: '' };
 const SUCCESS_VISIBLE_MS = 6000;
 
+// border-border-strong (y no border-border): el contorno de un control de
+// formulario necesita ≥ 3:1 contra el fondo (WCAG 1.4.11). border-border es
+// ~1.4:1 en el kit away.
 const inputClass =
-  'w-full rounded-lg border border-border bg-bg-secondary px-4 py-3 text-sm text-text-primary ' +
+  'w-full rounded-lg border border-border-strong bg-bg-secondary px-4 py-3 text-sm text-text-primary ' +
   'placeholder:text-text-muted transition-colors duration-200 focus-visible:border-accent';
 
 function Field({

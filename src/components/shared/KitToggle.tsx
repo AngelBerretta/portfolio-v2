@@ -18,10 +18,11 @@ export function KitToggle({ className }: KitToggleProps) {
     <button
       type="button"
       onClick={toggleKit}
-      // El texto visible es "Local" / "Visitante": el aria-label usa las mismas
-      // palabras (antes decía "kit away/home") para que lectores de pantalla y
-      // quien usa control por voz oigan lo mismo que ven.
-      aria-label={`Cambiar al kit ${KIT_LABEL[next].toLowerCase()}`}
+      // WCAG 2.5.3 (Label in Name): el texto visible es el kit ACTUAL
+      // ("Local" / "Visitante"), así que el nombre accesible tiene que
+      // empezar por esa misma palabra. Si no, quien usa control por voz dice
+      // "clic en Local" y no pasa nada.
+      aria-label={`${KIT_LABEL[kit]}. Cambiar al kit ${KIT_LABEL[next].toLowerCase()}`}
       title={`Kit actual: ${KIT_LABEL[kit]}`}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-full",
