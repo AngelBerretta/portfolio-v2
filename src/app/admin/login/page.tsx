@@ -2,7 +2,7 @@ import { LoginForm } from '@/components/admin/LoginForm';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 
-export const instant = false;
+// export const instant = false;
 
 export const metadata = { title: 'Admin — Login' };
 

@@ -3,7 +3,7 @@ import { FolderKanban, Sparkles, Star, Construction } from 'lucide-react';
 import { prisma } from '@/lib/db';
 import { auth } from '@/auth';
 
-export const instant = false;
+// export const instant = false;
 
 async function getStats() {
   const [totalProjects, featuredProjects, inProgressProjects, totalSkills, totalTags] =
