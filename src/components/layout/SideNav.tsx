@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useSitePathname } from '@/hooks/useSitePathname';
 import { cn } from '@/utils/cn';
 import { useScrollState } from '@/hooks/useScrollState';
 import { useActiveSection } from '@/hooks/useActiveSection';
@@ -12,7 +12,7 @@ import { SECTION_ITEMS } from './nav-items';
  * Aparecen después de scrollear un poco y marcan la sección activa.
  */
 export function SideNav() {
-  const pathname = usePathname();
+  const pathname = useSitePathname();
   const { isSideNavVisible } = useScrollState();
   const activeId = useActiveSection();
 

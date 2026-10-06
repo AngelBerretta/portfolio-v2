@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useSitePathname } from '@/hooks/useSitePathname';
 import { Menu } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useScrollState } from '@/hooks/useScrollState';
@@ -12,7 +12,7 @@ import { NavbarMobileMenu } from './NavbarMobileMenu';
 import { NAV_LINKS } from './nav-items';
 
 export function Navbar() {
-  const pathname = usePathname();
+  const pathname = useSitePathname();
   const { isScrolled } = useScrollState();
   const section = useActiveSection();
 

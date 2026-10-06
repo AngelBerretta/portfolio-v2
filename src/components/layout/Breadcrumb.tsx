@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useSitePathname } from '@/hooks/useSitePathname';
 import { ChevronRight, Home } from 'lucide-react';
 
 // Labels para los segmentos de URL que no se ven bien "humanizados" a secas.
@@ -31,7 +31,7 @@ function labelFor(segment: string): string {
  * contenido no quede tapado por el navbar fijo.
  */
 export function Breadcrumb() {
-  const pathname = usePathname();
+  const pathname = useSitePathname();
   const segments = pathname.split('/').filter(Boolean);
 
   if (segments.length === 0) return null;
