@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
+  // cacheComponents: true,
 
   images: {
     // Las imágenes que se suben desde el admin viven en Vercel Blob.
