@@ -10,16 +10,12 @@ import {
 } from 'react';
 
 export interface ScrollContextValue {
-  scrollY: number;
-  scrollProgress: number;
   isScrolled: boolean;
   showBackToTop: boolean;
   isSideNavVisible: boolean;
 }
 
 const defaultValue: ScrollContextValue = {
-  scrollY: 0,
-  scrollProgress: 0,
   isScrolled: false,
   showBackToTop: false,
   isSideNavVisible: false,
@@ -34,9 +30,8 @@ const ScrollContext = createContext<ScrollContextValue>(defaultValue);
  * los mismos valores.
  *
  * ScrollProvider centraliza eso en un único listener + un único rAF para
- * toda la página. Los componentes consumen el resultado ya calculado vía
- * useScrollContext() (o el wrapper useScrollState(), que se mantiene por
- * compatibilidad) sin agregar trabajo extra al scroll.
+ * toda la página guardando únicamente los booleanos, evitando re-renderizar
+ * toda la app 60 veces por segundo durante el scroll.
  */
 export function ScrollProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ScrollContextValue>(defaultValue);
@@ -53,18 +48,21 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
 
       rafRef.current = requestAnimationFrame(() => {
         const scrollY = latestScrollY.current;
-        const docHeight =
-          document.documentElement.scrollHeight - window.innerHeight;
-        const scrollProgress =
-          docHeight > 0 ? Math.min((scrollY / docHeight) * 100, 100) : 0;
 
-        setState({
-          scrollY,
-          scrollProgress,
+        const next = {
           isScrolled: scrollY > 40,        // mismo umbral que Navbar
           showBackToTop: scrollY > 500,    // mismo umbral que BackToTop
           isSideNavVisible: scrollY > 200, // mismo umbral que SideNav
-        });
+        };
+
+        // Solo hace el render si alguno de los booleanos cambió realmente
+        setState((prev) =>
+          prev.isScrolled === next.isScrolled &&
+          prev.showBackToTop === next.showBackToTop &&
+          prev.isSideNavVisible === next.isSideNavVisible
+            ? prev
+            : next
+        );
 
         rafRef.current = null;
       });

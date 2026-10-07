@@ -1,21 +1,30 @@
 'use client';
 
-import { useScrollState } from '@/hooks/useScrollState';
+import { useEffect, useRef } from 'react';
 
-/** Barra fina arriba de todo que muestra cuánto de la página se recorrió. */
 export function ScrollProgress() {
-  const { scrollProgress } = useScrollState();
+  const bar = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+      if (bar.current) bar.current.style.transform = `scaleX(${p})`;
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5"
-    >
-      {/* scaleX en vez de width: no dispara layout en cada frame de scroll */}
-      <div
-        className="h-full origin-left bg-accent"
-        style={{ transform: `scaleX(${scrollProgress / 100})` }}
-      />
+    <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5">
+      <div ref={bar} className="h-full origin-left bg-accent" style={{ transform: 'scaleX(0)' }} />
     </div>
   );
 }

@@ -12,7 +12,6 @@ import {
 import { AlertCircle, Loader2, Send } from 'lucide-react';
 import { sendContactMessage } from '@/actions/contact';
 import type { ActionResult } from '@/lib/action-types';
-import { gsap, useGSAP, MOTION_OK } from '@/animations/gsap.config';
 import { useRevealOnScroll } from '@/animations/useRevealOnScroll';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/utils/cn';
@@ -96,39 +95,32 @@ export function TransferForm() {
   const failure = state?.success === false ? state : null;
   const fieldErrors = failure?.fieldErrors;
 
-  // Micro-animación de éxito: el badge "salta", el tilde se dibuja y el texto
-  // entra. Con prefers-reduced-motion no corre y todo queda en su estado final.
-  useGSAP(
-    () => {
-      if (!showSuccess) return;
+  useEffect(() => {
+    if (!showSuccess) return;
+    let cancelled = false;
+    let mm: { revert(): void } | undefined;
 
-      const mm = gsap.matchMedia();
-      mm.add(MOTION_OK, () => {
+    import('@/animations/gsap.config').then(({ gsap, MOTION_OK }) => {
+      if (cancelled) return;
+      const instance = gsap.matchMedia(statusRef.current ?? undefined);
+      mm = instance;
+      instance.add(MOTION_OK, () => {
         gsap
           .timeline()
-          .fromTo(
-            '[data-success-badge]',
-            { scale: 0.5, opacity: 0 },
-            { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2.2)', clearProps: 'transform,opacity' }
-          )
-          .fromTo(
-            '[data-success-check]',
-            { strokeDashoffset: 1 },
-            { strokeDashoffset: 0, duration: 0.35, ease: 'power2.out' },
-            '-=0.15'
-          )
-          .fromTo(
-            '[data-success-text]',
-            { opacity: 0, y: 6 },
-            { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out', clearProps: 'transform,opacity' },
-            '-=0.25'
-          );
+          .fromTo('[data-success-badge]', { scale: 0.5, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2.2)', clearProps: 'transform,opacity' })
+          .fromTo('[data-success-check]', { strokeDashoffset: 1 },
+            { strokeDashoffset: 0, duration: 0.35, ease: 'power2.out' }, '-=0.15')
+          .fromTo('[data-success-text]', { opacity: 0, y: 6 },
+            { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out', clearProps: 'transform,opacity' }, '-=0.25');
       });
+    });
 
-      return () => mm.revert();
-    },
-    { scope: statusRef, dependencies: [showSuccess], revertOnUpdate: true }
-  );
+    return () => {
+      cancelled = true;
+      mm?.revert();
+    };
+  }, [showSuccess]);
 
   const fieldProps = (name: FieldName) => {
     const hasError = !!fieldErrors?.[name]?.length;

@@ -12,7 +12,7 @@ import { usePrefersReducedMotion } from './usePrefersReducedMotion';
  * `words` debe tener identidad estable (constante de módulo o useMemo):
  * si pasás un array literal nuevo en cada render, el efecto se reinicia.
  */
-export function useTypewriter(words: readonly string[], speed = 80, pause = 2000) {
+export function useTypewriter(words: readonly string[], speed = 80, pause = 2000, paused = false) {  
   const reduced = usePrefersReducedMotion();
   const first = words[0] ?? '';
   const [text, setText] = useState(first);
@@ -21,7 +21,7 @@ export function useTypewriter(words: readonly string[], speed = 80, pause = 2000
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (reduced || words.length === 0) return;
+    if (reduced || paused || words.length === 0) return;
 
     const word = words[wordIdx];
     let timeout: ReturnType<typeof setTimeout>;
@@ -49,7 +49,7 @@ export function useTypewriter(words: readonly string[], speed = 80, pause = 2000
     }
 
     return () => clearTimeout(timeout);
-  }, [charIdx, deleting, wordIdx, words, speed, pause, reduced]);
+  }, [charIdx, deleting, wordIdx, words, speed, pause, reduced, paused]);
 
   return reduced ? (words[0] ?? '') : text;
 }
