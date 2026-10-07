@@ -166,6 +166,18 @@ section[id] {
   }
 }
 
+@keyframes hero-rise {
+  from { transform: translateY(20px); }
+  to   { transform: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-rise {
+    animation: hero-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--hero-delay, 0s);
+  }
+}
+
 /* ================================================================
    REDUCED MOTION — red de seguridad global
    Las transiciones/animaciones de Tailwind (hover:-translate-y-1,

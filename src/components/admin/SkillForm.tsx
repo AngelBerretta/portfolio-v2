@@ -177,7 +177,7 @@ export function SkillForm<T = undefined>({
               value={iconUrl}
               onChange={(e) => setIconUrl(e.target.value)}
               className={inputClass}
-              placeholder="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg"
+              placeholder="https://jsdelivr.net"
             />
             <input type="hidden" name="iconName" value="" />
           </Field>

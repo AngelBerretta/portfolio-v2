@@ -69,15 +69,15 @@ export function AboutContent({
           <div
             key={key}
             data-reveal
-            className="flex items-start gap-3 rounded-lg border border-border-subtle bg-bg-card p-4"
+            className="rounded-lg border border-border-subtle bg-bg-card p-4"
           >
-            <Icon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent" aria-hidden="true" />
-            <div className="min-w-0">
-              <dt className="text-xs font-medium text-text-muted">{label}</dt>
-              <dd className="mt-0.5 text-sm font-medium leading-snug text-text-primary">
-                {facts[key]}
-              </dd>
-            </div>
+            <dt className="flex items-center gap-3 text-xs font-medium text-text-muted">
+              <Icon className="h-[18px] w-[18px] shrink-0 text-accent" aria-hidden="true" />
+              {label}
+            </dt>
+            <dd className="mt-1 pl-[30px] text-sm font-medium leading-snug text-text-primary">
+              {facts[key]}
+            </dd>
           </div>
         ))}
       </dl>

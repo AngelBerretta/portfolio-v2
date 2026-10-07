@@ -14,9 +14,10 @@ import { usePrefersReducedMotion } from './usePrefersReducedMotion';
  */
 export function useTypewriter(words: readonly string[], speed = 80, pause = 2000) {
   const reduced = usePrefersReducedMotion();
-  const [text, setText] = useState('');
+  const first = words[0] ?? '';
+  const [text, setText] = useState(first);
   const [wordIdx, setWordIdx] = useState(0);
-  const [charIdx, setCharIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(first.length);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {

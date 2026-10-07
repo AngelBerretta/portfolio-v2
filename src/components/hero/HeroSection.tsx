@@ -44,11 +44,11 @@ export function HeroSection({ stats = HERO_STATS }: { stats?: HeroStat[] }) {
       <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8">
         {/* ── Texto ─────────────────────────────────────────── */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-          <h1 className="hero-intro font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl">
+          <h1 className="hero-rise font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl">
             Angel <span className="text-accent">Berretta</span>
           </h1>
 
-          <div className="hero-intro mt-5 w-full" style={delay(0.15)}>
+          <div className="hero-rise mt-5 w-full" style={delay(0.15)}>
             <TypedRole roles={ROLES} />
           </div>
 
@@ -68,7 +68,7 @@ export function HeroSection({ stats = HERO_STATS }: { stats?: HeroStat[] }) {
             </span>
           </p>
 
-          <div className="hero-intro mt-6" style={delay(0.3)}>
+          <div className="hero-rise mt-6" style={delay(0.3)}>
             <Badge variant="win" className="px-4 py-1.5 text-sm">
               <span className="h-2 w-2 rounded-full bg-win motion-safe:animate-pulse" />
               Disponible para trabajar
@@ -117,14 +117,14 @@ export function HeroSection({ stats = HERO_STATS }: { stats?: HeroStat[] }) {
       </div>
 
       <div className="relative z-10 mx-auto mt-14 w-full max-w-6xl md:mb-8">
-        <StatsHUD stats={stats} delay={0.5} />
+        <StatsHUD stats={stats} delay={0.3} />
       </div>
 
       <Link
         href="/#about"
         aria-label="Ir a la sección Sobre mí"
         className="hero-intro absolute bottom-4 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-text-muted transition-colors hover:text-accent md:flex"
-        style={delay(1.2)}
+        style={delay(0.6)}
       >
         <span className="text-xs">Scroll</span>
         <ArrowDown className="h-4 w-4 motion-safe:animate-bounce" />

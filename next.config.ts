@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // cacheComponents: true,
-
+  experimental: {
+    inlineCss: true,  
+  }, 
   images: {
     // Las imágenes que se suben desde el admin viven en Vercel Blob.
     // Sin esto, next/image rechaza esas URLs. Las rutas locales
