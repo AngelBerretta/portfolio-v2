@@ -4,24 +4,34 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
 } from 'react';
+import { useSectionSpy } from '@/hooks/useSectionSpy';
+import type { SectionId } from '@/lib/sections';
 
 export interface ScrollContextValue {
   isScrolled: boolean;
   showBackToTop: boolean;
   isSideNavVisible: boolean;
+  /** Sección visible según el scroll spy (solo significativa en el home). */
+  activeSection: SectionId;  
 }
 
-const defaultValue: ScrollContextValue = {
+type ScrollFlags = Omit<ScrollContextValue, 'activeSection'>;
+
+const defaultFlags: ScrollFlags = {
   isScrolled: false,
   showBackToTop: false,
   isSideNavVisible: false,
 };
 
-const ScrollContext = createContext<ScrollContextValue>(defaultValue);
+const ScrollContext = createContext<ScrollContextValue>({
+  ...defaultFlags,
+  activeSection: 'hero',
+});
 
 /**
  * Antes, Navbar, SideNav, BackToTop y ScrollProgress instanciaban cada uno
@@ -34,7 +44,12 @@ const ScrollContext = createContext<ScrollContextValue>(defaultValue);
  * toda la app 60 veces por segundo durante el scroll.
  */
 export function ScrollProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<ScrollContextValue>(defaultValue);
+  const [state, setState] = useState<ScrollFlags>(defaultFlags);
+  const activeSection = useSectionSpy();
+  const value = useMemo<ScrollContextValue>(
+    () => ({ ...state, activeSection }),
+    [state, activeSection]
+  );
 
   const rafRef = useRef<number | null>(null);
   const latestScrollY = useRef(0);
@@ -82,7 +97,7 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ScrollContext.Provider value={state}>
+    <ScrollContext.Provider value={value}>
       {children}
     </ScrollContext.Provider>
   );
