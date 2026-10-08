@@ -1,4 +1,5 @@
 import { SectionHeading } from '@/components/shared/SectionHeading';
+import { Glow } from '@/components/shared/Glow';
 import { TransferForm } from './TransferForm';
 import { TransferInfo } from './TransferInfo';
 
@@ -15,7 +16,7 @@ export function TransferSection() {
       className="relative overflow-hidden py-24 md:py-32"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute bottom-0 left-1/2 h-64 w-[600px] max-w-full -translate-x-1/2 rounded-full bg-accent-ghost blur-3xl" />
+         <Glow className="absolute bottom-0 left-1/2 h-80 w-[760px] max-w-full -translate-x-1/2 translate-y-8" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">

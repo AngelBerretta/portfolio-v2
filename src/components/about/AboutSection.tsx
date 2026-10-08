@@ -1,6 +1,7 @@
 import { getProfile } from '@/actions/profile';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { Reveal } from '@/components/shared/Reveal';
+import { Glow } from '@/components/shared/Glow';
 import { AboutContent } from './AboutContent';
 import { PlayerCard } from './PlayerCard';
 
@@ -25,7 +26,7 @@ export async function AboutSection() {
       className="relative overflow-hidden py-24 md:py-32"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-accent-ghost blur-3xl" />
+        <Glow className="absolute -left-16 -top-16 h-[26rem] w-[26rem]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">

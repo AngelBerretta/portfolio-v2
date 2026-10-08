@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { ArrowDown, Mail } from 'lucide-react';
 import { Badge } from '@/components/shared/Badge';
+import { Glow } from '@/components/shared/Glow';
 import { ArgentinaFlag, GitHubIcon, LinkedInIcon } from '@/components/shared/icons';
 import { BallStage } from './BallStage';
 import { StatsHUD } from './StatsHUD';
@@ -38,7 +39,7 @@ export function HeroSection({ stats = HERO_STATS }: { stats?: HeroStat[] }) {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute inset-y-0 left-1/2 w-px bg-border-ghost" />
         <div className="absolute left-1/2 top-1/2 hidden h-[44rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border-ghost sm:block" />
-        <div className="absolute right-[6%] top-1/4 h-[28rem] w-[28rem] rounded-full bg-accent-ghost blur-3xl" />
+        <Glow className="absolute right-[6%] top-1/4 h-[36rem] w-[36rem] translate-x-16 -translate-y-16" />
       </div>
 
       <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8">

@@ -66,10 +66,11 @@ export function MatchCard({ project, index }: { project: ProjectCardData; index:
               Destacado
             </span>
           )}
-          {/* Fondo casi opaco: sobre una captura clara, el verde translúcido no se lee. */}
+          {/* Fondo casi opaco: sobre una captura clara, el verde translúcido no se lee.
+              Sin backdrop-blur: multiplicado por cada card cuesta GPU y casi no se nota. */}
           <ScoreBadge
             status={project.status}
-            className="absolute right-3 top-3 z-10 bg-bg-body/85 backdrop-blur-sm"
+            className="absolute right-3 top-3 z-10 bg-bg-body/90"
           />
         </div>
       ) : (

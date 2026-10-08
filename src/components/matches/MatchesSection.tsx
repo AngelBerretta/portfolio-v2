@@ -1,6 +1,7 @@
 import { getAllProjects } from '@/actions/projects';
 import { PROJECT_FILTER_TABS } from '@/lib/constants';
 import { SectionHeading } from '@/components/shared/SectionHeading';
+import { Glow } from '@/components/shared/Glow';
 import { cn } from '@/utils/cn';
 import { MatchList } from './MatchList';
 import { mapProjectsToCardData, splitLiveUpcoming } from './mapProjects';
@@ -32,7 +33,7 @@ export async function MatchesSection({ variant = 'page' }: { variant?: 'home' | 
       className={cn('relative overflow-hidden', isHome ? 'py-24 md:py-32' : 'pb-24 pt-10')}
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute right-1/4 top-0 h-80 w-80 rounded-full bg-accent-ghost blur-3xl" />
+        <Glow className="absolute right-1/4 top-0 h-[28rem] w-[28rem] translate-x-16 -translate-y-16" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">

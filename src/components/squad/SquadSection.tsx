@@ -1,6 +1,7 @@
 import { getSkillsByCategory } from '@/actions/skills';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { Reveal } from '@/components/shared/Reveal';
+import { Glow } from '@/components/shared/Glow';
 import { PositionGroup } from './PositionGroup';
 import type { PositionGroupData, SkillCategoryId } from './types';
 
@@ -76,7 +77,7 @@ export async function SquadSection() {
       className="relative overflow-hidden py-24 md:py-32"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/4 top-0 h-80 w-80 rounded-full bg-accent-ghost blur-3xl" />
+        <Glow className="absolute left-1/4 top-0 h-[28rem] w-[28rem] -translate-x-16 -translate-y-16" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">

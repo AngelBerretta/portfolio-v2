@@ -16,7 +16,7 @@ export function StatsHUD({
   return (
     <dl
       className={cn(
-        'hero-intro grid divide-x divide-border-subtle rounded-lg border border-border bg-bg-card/60 backdrop-blur-sm',
+        'hero-intro grid divide-x divide-border-subtle rounded-lg border border-border bg-bg-card/90 md:bg-bg-card/60 md:backdrop-blur-sm',
         className
       )}
       style={
