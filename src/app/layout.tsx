@@ -50,9 +50,6 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },
-  icons: {
-    icon: "/favicon.svg",
-  },
 };
 
 // Los dos kits (home / away) son oscuros, así que el color de la barra del
