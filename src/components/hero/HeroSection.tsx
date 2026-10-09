@@ -33,7 +33,7 @@ export function HeroSection({ stats = HERO_STATS }: { stats?: HeroStat[] }) {
   return (
     <section
       id="hero"
-      className="relative flex min-h-dvh flex-col justify-center overflow-hidden px-4 pb-16 pt-28 sm:px-6 md:pb-24"
+      className="relative flex min-h-svh flex-col justify-center overflow-hidden px-4 pb-16 pt-28 sm:px-6 md:pb-24"
     >
       {/* Fondo: líneas de cancha (círculo central + línea media) y un resplandor */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
