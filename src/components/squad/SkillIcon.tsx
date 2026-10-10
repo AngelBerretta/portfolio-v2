@@ -36,6 +36,8 @@ export function SkillIcon({
         width={20}
         height={20}
         unoptimized
+        loading="eager"
+        fetchPriority="low"
         className={cn('h-5 w-5 object-contain', skill.invertIcon && 'invert', className)}
       />
     );

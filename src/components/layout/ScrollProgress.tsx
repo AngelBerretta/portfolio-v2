@@ -7,17 +7,30 @@ export function ScrollProgress() {
 
   useEffect(() => {
     let raf = 0;
+    let max = 0;
+
+    const measure = () => {
+      max = document.documentElement.scrollHeight - window.innerHeight;
+    };
     const update = () => {
       raf = 0;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
       const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
       if (bar.current) bar.current.style.transform = `scaleX(${p})`;
     };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+
+    measure();
     update();
-    window.addEventListener('scroll', onScroll, { passive: true });
+
+    const ro = new ResizeObserver(() => { measure(); schedule(); });
+    ro.observe(document.body);
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', schedule, { passive: true });
+
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', schedule);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
