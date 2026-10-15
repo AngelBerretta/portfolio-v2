@@ -9,7 +9,7 @@
   visibility: hidden;
   pointer-events: none;
   /* visibility se retrasa al cerrar para que se vea la animación de salida */
-  transition: visibility 0s linear 0.3s;
+  transition: visibility 0s linear 0.35s;
 }
 
 .nav-mobile[data-open="true"] {
@@ -21,7 +21,7 @@
 .nav-mobile__backdrop {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.7);
+  background: rgb(0 0 0 / 0.72);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -37,26 +37,69 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  width: min(20rem, 85vw);
+  width: min(21rem, 88vw);
   height: 100dvh;
   padding: 1.25rem;
   padding-top: max(1.25rem, env(safe-area-inset-top));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
   padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
-  background: var(--color-bg-secondary);
+  /* Resplandor del acento en la esquina, igual que el <Glow> de las secciones
+     pero como background: no suma un nodo ni un filtro. */
+  background:
+    radial-gradient(18rem 18rem at 100% 0%, var(--color-accent-ghost), transparent) no-repeat,
+    var(--color-bg-secondary);
   border-left: 1px solid var(--color-border-subtle);
+  box-shadow: -24px 0 48px rgb(0 0 0 / 0.35);
   transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   overflow-y: auto;
+  /* pan-y: el navegador sigue haciendo el scroll vertical y nosotros
+     recibimos los gestos horizontales (swipe para cerrar). */
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 .nav-mobile[data-open="true"] .nav-mobile__panel {
   transform: translateX(0);
 }
 
+/* Mientras el dedo arrastra, el panel sigue al dedo sin transición. */
+.nav-mobile__panel[data-dragging="true"] {
+  transition: none;
+}
+
+/* ── Entrada escalonada ─────────────────────────────────
+   Cada fila (y el pie) entra desde la derecha con un pequeño retraso,
+   según su índice --i. Es la única animación "de lucimiento" del menú:
+   responde a la acción de abrirlo. Al cerrar, sale todo junto. */
+
+.nav-mobile__reveal {
+  opacity: 0;
+  transform: translateX(1rem);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.nav-mobile[data-open="true"] .nav-mobile__reveal {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(0.1s + var(--i, 0) * 0.045s);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nav-mobile,
   .nav-mobile__backdrop,
-  .nav-mobile__panel {
-    transition: none;
+  .nav-mobile__panel,
+  .nav-mobile__reveal {
+    transition: none !important;
+  }
+
+  .nav-mobile__reveal {
+    opacity: 1;
+    transform: none;
   }
 }
