@@ -11,6 +11,10 @@ import { BallFallback } from './BallFallback';
 // único importador de three en el hero, queda en un chunk separado.
 const BallScene = dynamic(() => import('./BallScene'), { ssr: false });
 
+// Si el 3D no está listo pasado este tiempo, se muestra el 2D igual para que
+// el espacio no quede vacío (red lenta, equipo muy cargado).
+const FALLBACK_AFTER_MS = 3000;
+
 /** Si WebGL o el chunk fallan, el error no debe tumbar todo el hero. */
 class BallErrorBoundary extends Component<
   { onError: () => void; children: ReactNode },
@@ -29,15 +33,20 @@ class BallErrorBoundary extends Component<
 }
 
 /**
- * Muestra SIEMPRE el balón 2D primero (viene en el HTML del servidor, no hay
- * layout shift ni espera). El 3D se carga recién cuando se cumplen TODAS estas
- * condiciones, en este orden:
+ * El balón 2D es la red de seguridad, no el primer paso. Nace oculto y solo
+ * se muestra cuando ya se sabe que el 3D no va a llegar (o tarda demasiado):
+ *   - el dispositivo no lo aguanta (WebGL, memoria, "ahorro de datos");
+ *   - prefers-reduced-motion;
+ *   - el 3D falló;
+ *   - pasaron FALLBACK_AFTER_MS sin que el 3D esté listo.
+ * En los demás casos entra directamente el 3D, con un fade, y no hay un
+ * cambio 2D → 3D que se note.
+ *
+ * El 3D se carga recién cuando se cumplen TODAS estas condiciones, en orden:
  *   1. el balón entró en pantalla (IntersectionObserver). Si está oculto con
  *      display:none (mobile) nunca "entra", así que three.js no se descarga;
  *   2. la página terminó de cargar y el navegador está ocioso;
- *   3. el dispositivo lo aguanta (WebGL, memoria, sin "ahorro de datos").
- * Se queda en 2D con prefers-reduced-motion o ante cualquier error. La textura
- * y la geometría se crean al montar BallScene, o sea, solo después de todo esto.
+ *   3. el dispositivo lo aguanta.
  */
 export function BallStage({ className }: { className?: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -46,22 +55,36 @@ export function BallStage({ className }: { className?: string }) {
   const [idle, setIdle] = useState(false);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  // true cuando ya se decidió mostrar el 2D (ver el comentario de arriba).
+  const [show2D, setShow2D] = useState(false);
 
   // 1. Esperar a que el balón sea visible. Una sola vez: después, BallScene
-  //    pausa su propio render cuando sale de pantalla.
+  //    pausa su propio render cuando sale de pantalla. En ese mismo momento
+  //    se decide si el 2D hace falta ya o si se espera al 3D.
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
 
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setInView(true);
-        observer.disconnect();
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      setInView(true);
+
+      if (reducedMotion || !canRender3D()) {
+        setShow2D(true);
+      } else {
+        timer = setTimeout(() => setShow2D(true), FALLBACK_AFTER_MS);
       }
     });
     observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [reducedMotion]);
 
   // 2 y 3. Ya visible: esperar a que el navegador esté libre.
   useEffect(() => {
@@ -71,13 +94,14 @@ export function BallStage({ className }: { className?: string }) {
 
   const show3D = idle && !reducedMotion && !failed;
   const threeVisible = show3D && ready;
+  const fallbackVisible = (show2D || failed) && !threeVisible;
 
   return (
     <div ref={rootRef} className={cn('relative', className)} aria-hidden="true">
       <BallFallback
         className={cn(
           'absolute inset-0 h-full w-full transition-opacity duration-500',
-          threeVisible && 'opacity-0'
+          !fallbackVisible && 'opacity-0'
         )}
       />
 
