@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { cn } from '@/utils/cn';
 import { ArgentinaFlag } from '@/components/shared/icons';
-import { PLAYER } from './player-data';
+import { PLAYER, overallRating, type PlayerAttribute } from './player-data';
 
 /**
  * Carta de jugador estilo FIFA: foto, posición y atributos. Vive en "Sobre mí"
@@ -15,14 +15,15 @@ import { PLAYER } from './player-data';
  */
 export function PlayerCard({
   avatarUrl,
+  attributes,
   className,
 }: {
   avatarUrl?: string | null;
+  attributes: PlayerAttribute[];
   className?: string;
 }) {
-  const rating = Math.round(
-    PLAYER.attributes.reduce((sum, a) => sum + a.value, 0) / PLAYER.attributes.length
-  );
+  const rating = overallRating(attributes);
+
   const initials = PLAYER.name
     .split(' ')
     .map((w) => w[0])
@@ -68,7 +69,7 @@ export function PlayerCard({
       </figcaption>
 
       <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 border-t border-border-subtle pt-4">
-        {PLAYER.attributes.map((attr) => (
+        {attributes.map((attr) => (
           <li key={attr.label} className="flex items-baseline gap-2">
             <span className="w-7 font-display text-lg font-bold tabular-nums text-accent">
               {attr.value}

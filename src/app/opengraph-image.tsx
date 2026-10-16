@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
-import { PLAYER } from '@/components/about/player-data';
+import { PLAYER, overallRating } from '@/components/about/player-data';
+import { getPlayerAttributes } from '@/components/about/player-stats';
 import { SITE_URL } from '@/lib/site';
 
 // Imagen que se ve al compartir el link en WhatsApp, LinkedIn, X, etc.
@@ -22,11 +23,9 @@ const MUTED = '#999999';
 
 const STACK = ['React', 'Next.js', 'Node.js', 'TypeScript'];
 
-export default function OpengraphImage() {
-  // Mismo cálculo que PlayerCard: promedio de los atributos.
-  const rating = Math.round(
-    PLAYER.attributes.reduce((sum, a) => sum + a.value, 0) / PLAYER.attributes.length
-  );
+export default async function OpengraphImage() {
+  const attributes = await getPlayerAttributes();
+  const rating = overallRating(attributes);
   const host = new URL(SITE_URL).host;
 
   return new ImageResponse(

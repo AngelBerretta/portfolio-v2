@@ -4,6 +4,7 @@ import { Reveal } from '@/components/shared/Reveal';
 import { Glow } from '@/components/shared/Glow';
 import { AboutContent } from './AboutContent';
 import { PlayerCard } from './PlayerCard';
+import { getPlayerAttributes } from './player-stats';
 
 /**
  * Sección "Sobre mí". Server component async: quien la use debe envolverla en
@@ -13,7 +14,7 @@ import { PlayerCard } from './PlayerCard';
  * Usa id="about" porque es el que espera el scroll spy y nav-items.ts.
  */
 export async function AboutSection() {
-  const profile = await getProfile();
+  const [profile, attributes] = await Promise.all([getProfile(), getPlayerAttributes()]);
 
   // El perfil se siembra con prisma/seed.ts. Si todavía no existe, la sección
   // no se muestra en vez de romper la página.
@@ -39,7 +40,7 @@ export async function AboutSection() {
 
         <div className="grid items-start gap-14 lg:grid-cols-[0.9fr_1.1fr]">
           <Reveal direction="left" className="mx-auto w-full max-w-[19rem] sm:max-w-sm">
-            <PlayerCard avatarUrl={profile.avatarUrl} />
+            <PlayerCard avatarUrl={profile.avatarUrl} attributes={attributes} />
           </Reveal>
 
           <AboutContent
