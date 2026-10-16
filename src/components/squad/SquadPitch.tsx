@@ -92,12 +92,14 @@ function PlayerToken({
   player,
   selected,
   onSelect,
+  onHover,
   className,
   variant = 'bench',
 }: {
   player: SquadPlayer;
   selected: boolean;
   onSelect: (id: string) => void;
+  onHover: (id: string | null) => void;
   className?: string;
   variant?: keyof typeof TOKEN_SIZES;
 }) {
@@ -109,7 +111,13 @@ function PlayerToken({
     <button
       type="button"
       data-player
-      onClick={() => onSelect(skill.id)}
+      onClick={(e) => {
+        // Con mouse ya se seleccionó al pasar el cursor; el clic no debe deseleccionar.
+        if ((e.nativeEvent as PointerEvent).pointerType === 'mouse') return;
+        onSelect(skill.id);
+      }}
+      onPointerEnter={(e) => e.pointerType === 'mouse' && onHover(skill.id)}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && onHover(null)}
       aria-pressed={selected}
       aria-label={`${skill.name}, ${t.label}`}
       className={cn('group flex flex-col items-center rounded-md', size.button, className)}
@@ -145,12 +153,14 @@ function TeamHalf({
   reverse,
   selectedId,
   onSelect,
+  onHover,
 }: {
   team: SkillCategoryId;
   players: SquadPlayer[];
   reverse?: boolean;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onHover: (id: string | null) => void;
 }) {
   const lines = buildFormation(players);
   const ordered = reverse ? [...lines].reverse() : lines;
@@ -169,6 +179,7 @@ function TeamHalf({
                 player={player}
                 selected={selectedId === player.skill.id}
                 onSelect={onSelect}
+                onHover={onHover}
                 variant="pitch"
                 className="w-full"
               />
@@ -185,11 +196,13 @@ function BenchGroup({
   items,
   selectedId,
   onSelect,
+  onHover,
 }: {
   title: string;
   items: SquadPlayer[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onHover: (id: string | null) => void;
 }) {
   if (items.length === 0) return null;
 
@@ -205,6 +218,7 @@ function BenchGroup({
               player={player}
               selected={selectedId === player.skill.id}
               onSelect={onSelect}
+              onHover={onHover}
               className="w-full rounded-lg bg-bg-secondary py-2 transition-colors hover:bg-bg-elevated"
             />
           </li>
@@ -219,18 +233,20 @@ function Bench({
   reserves,
   selectedId,
   onSelect,
+  onHover,
 }: {
   staff: SquadPlayer[];
   reserves: SquadPlayer[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onHover: (id: string | null) => void;
 }) {
   if (staff.length === 0 && reserves.length === 0) return null;
 
   return (
     <section
       aria-labelledby="bench-heading"
-      className="rounded-xl border border-border bg-bg-card p-5 lg:col-start-2 lg:row-start-2"
+      className="rounded-xl border border-border bg-bg-card p-5"
     >
       <MatchdayBadge code="SUP" title="Tecnologías que no juegan de titular">
         Suplentes
@@ -247,12 +263,14 @@ function Bench({
         items={staff}
         selectedId={selectedId}
         onSelect={onSelect}
+        onHover={onHover}
       />
       <BenchGroup
         title="En reserva · esperan su turno"
         items={reserves}
         selectedId={selectedId}
         onSelect={onSelect}
+        onHover={onHover}
       />
     </section>
   );
@@ -269,8 +287,9 @@ function PlayerDetail({ player }: { player: SquadPlayer | null }) {
       aria-label="Ficha del jugador"
       className={cn(
         'rounded-xl border border-border bg-bg-card p-4 shadow-xl shadow-black/30',
+        'min-h-[7.5rem]',
         'max-lg:sticky max-lg:bottom-[max(1rem,env(safe-area-inset-bottom))] max-lg:z-30 max-lg:mr-14',
-        'lg:col-start-2 lg:row-start-1 lg:p-5 lg:shadow-none'
+        'max-lg:order-last lg:p-5 lg:shadow-none'
       )}
     >
       <div aria-live="polite">
@@ -298,7 +317,8 @@ function PlayerDetail({ player }: { player: SquadPlayer | null }) {
           </div>
         ) : (
           <p className="text-sm text-text-secondary">
-            Tocá un jugador para ver en qué lo uso.
+            <span className="lg:hidden">Tocá un jugador para ver en qué lo uso.</span>
+            <span className="hidden lg:inline">Pasá el mouse por un jugador para ver en qué lo uso.</span>
           </p>
         )}
       </div>
@@ -332,6 +352,7 @@ export function SquadPitch({
     null;
 
   const toggle = (id: string) => setSelectedId((current) => (current === id ? null : id));
+  const hover = (id: string | null) => setSelectedId(id);
 
   const total = topTeam.length + bottomTeam.length + reserves.length + staff.length;
   const ref = useRevealOnScroll<HTMLDivElement>({
@@ -372,6 +393,7 @@ export function SquadPitch({
               players={topTeam}
               selectedId={selectedId}
               onSelect={toggle}
+              onHover={hover}
             />
             <TeamHalf
               team="backend"
@@ -379,16 +401,21 @@ export function SquadPitch({
               reverse
               selectedId={selectedId}
               onSelect={toggle}
+              onHover={hover}
             />
           </div>
         </div>
       </div>
 
-      {/* El DOM va cancha → banco → ficha (en mobile la ficha queda fija abajo,
-          y tiene que estar al final para seguir visible mientras se mira el
-          banco). En desktop la ubican las clases lg:col/row-start. */}
-      <Bench staff={staff} reserves={reserves} selectedId={selectedId} onSelect={toggle} />
-      <PlayerDetail player={selected} />
+      {/* Desktop: toda la columna derecha acompaña el scroll de la cancha.
+          En mobile `contents` hace que los hijos sigan siendo hijos directos
+          del contenedor, así la ficha mantiene su sticky al fondo. */}
+      <div className="max-lg:contents lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-stretch">
+        <div className="max-lg:contents lg:sticky lg:top-20 lg:flex lg:flex-col lg:gap-6">
+          <PlayerDetail player={selected} />
+          <Bench staff={staff} reserves={reserves} selectedId={selectedId} onSelect={toggle} onHover={hover} />
+        </div>
+      </div>
     </div>
   );
 }
