@@ -15,17 +15,8 @@ export interface SquadSkill {
   invertIcon: boolean;
 }
 
-export interface PositionGroupData {
-  id: SkillCategoryId;
-  /** Nombre en lenguaje llano — es lo que se lee primero: "Frontend". */
-  title: string;
-  /** Nombre futbolero, secundario: "Delanteros". */
-  position: string;
-  /** Código decorativo estilo planilla: "DEL". */
-  code: string;
-  /** Qué significa el grupo, en una línea y sin metáfora. */
-  hint: string;
-  /** Clases completas de Tailwind (deben estar escritas enteras para que se generen). */
-  style: { badge: string; code: string };
-  skills: SquadSkill[];
+/** Una skill + el "equipo" al que pertenece (su categoría). */
+export interface SquadPlayer {
+  skill: SquadSkill;
+  team: SkillCategoryId;
 }

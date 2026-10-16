@@ -1,80 +1,54 @@
 import { getSkillsByCategory } from '@/actions/skills';
 import { SectionHeading } from '@/components/shared/SectionHeading';
-import { Reveal } from '@/components/shared/Reveal';
 import { Glow } from '@/components/shared/Glow';
-import { PositionGroup } from './PositionGroup';
-import type { PositionGroupData, SkillCategoryId } from './types';
+import { SquadPitch } from './SquadPitch';
+import type { SquadSkill } from './types';
 
-// Metadata visual y de copy por categoría. No vive en la DB: el `id` debe
-// coincidir con Skill.category (ver SKILL_CATEGORIES en lib/constants.ts).
-// Los colores salen de los tokens pos-* de globals.css, así que cambian solos
-// con el kit home / away. Las clases van escritas enteras para que Tailwind
-// las genere.
-const POSITIONS: Record<SkillCategoryId, Omit<PositionGroupData, 'id' | 'skills'>> = {
-  frontend: {
-    title: 'Frontend',
-    position: 'Delanteros',
-    code: 'DEL',
-    hint: 'Lo que ve y toca el usuario: interfaces, animaciones y experiencia.',
-    style: {
-      badge: 'border-pos-continental/30 bg-pos-continental/10 text-pos-continental',
-      code: 'bg-pos-continental text-text-inverse',
-    },
-  },
-  backend: {
-    title: 'Backend',
-    position: 'Defensa',
-    code: 'DEF',
-    hint: 'Lo que sostiene todo por detrás: servidores, APIs y bases de datos.',
-    style: {
-      badge: 'border-pos-champions/30 bg-pos-champions/10 text-pos-champions',
-      code: 'bg-pos-champions text-text-inverse',
-    },
-  },
-  tools: {
-    title: 'Herramientas',
-    position: 'Mediocampo',
-    code: 'MED',
-    hint: 'Lo que conecta al equipo: control de versiones, diseño y despliegue.',
-    style: {
-      badge: 'border-pos-champions-playoff/30 bg-pos-champions-playoff/10 text-pos-champions-playoff',
-      code: 'bg-pos-champions-playoff text-text-inverse',
-    },
-  },
-};
+interface RawSkill {
+  id: string;
+  name: string;
+  description: string | null;
+  iconUrl: string | null;
+  iconName: string | null;
+  invertIcon: boolean;
+}
 
-const ORDER: SkillCategoryId[] = ['frontend', 'backend', 'tools'];
+// getSkillsByCategory pasa por unstable_cache (JSON), así que acá armamos
+// objetos planos con solo lo que el cliente necesita.
+const toSquadSkills = (list: RawSkill[] | undefined): SquadSkill[] =>
+  (list ?? []).map((s) => ({
+    id: s.id,
+    name: s.name,
+    description: s.description ?? '',
+    iconUrl: s.iconUrl,
+    iconName: s.iconName,
+    invertIcon: s.invertIcon,
+  }));
 
 /**
- * Sección de tecnologías ("Plantel" en el menú). Server component async:
- * quien la use debe envolverla en <Suspense fallback={<SquadSkeleton />}>
- * (cacheComponents), igual que MatchesSection.
+ * Sección de tecnologías ("Plantel" en el menú): cancha con Frontend vs
+ * Backend y un banco con las herramientas y las tecnologías de reserva.
+ * Server component async: quien la use debe envolverla en
+ * <Suspense fallback={<SquadSkeleton />}> (cacheComponents).
  *
  * Usa id="skills" porque es el que espera el scroll spy y nav-items.ts.
+ *
+ * OJO: `overflow-clip` y no `overflow-hidden`. hidden convierte a la sección
+ * en un contenedor de scroll y rompe el `sticky` de la ficha en mobile.
  */
 export async function SquadSection() {
   const grouped = await getSkillsByCategory();
 
-  const groups: PositionGroupData[] = ORDER.filter((id) => grouped[id]?.length > 0).map((id) => ({
-    id,
-    ...POSITIONS[id],
-    // getSkillsByCategory pasa por unstable_cache (JSON), así que acá armamos
-    // objetos planos con solo lo que el cliente necesita.
-    skills: grouped[id].map((s) => ({
-      id: s.id,
-      name: s.name,
-      description: s.description ?? '',
-      iconUrl: s.iconUrl,
-      iconName: s.iconName,
-      invertIcon: s.invertIcon,
-    })),
-  }));
+  const frontend = toSquadSkills(grouped.frontend);
+  const backend = toSquadSkills(grouped.backend);
+  const tools = toSquadSkills(grouped.tools);
+  const hasSkills = frontend.length + backend.length + tools.length > 0;
 
   return (
     <section
       id="skills"
       aria-labelledby="squad-heading"
-      className="relative overflow-hidden py-24 md:py-32"
+      className="relative overflow-clip py-24 md:py-32"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Glow className="absolute left-1/4 top-0 h-[28rem] w-[28rem] -translate-x-16 -translate-y-16" />
@@ -85,17 +59,11 @@ export async function SquadSection() {
           id="squad-heading"
           eyebrow="02 · Plantel"
           title="Las tecnologías que uso"
-          description="Agrupadas por el rol que cumplen en un proyecto. Tocá una para ver en qué la uso."
+          description="Frontend contra Backend en la cancha y las herramientas en el banco. Tocá un jugador para ver en qué lo uso."
         />
 
-        {groups.length > 0 ? (
-          <div className="grid gap-6 lg:grid-cols-3">
-            {groups.map((group, i) => (
-              <Reveal key={group.id} delay={i * 0.1} className="h-full">
-                <PositionGroup group={group} />
-              </Reveal>
-            ))}
-          </div>
+        {hasSkills ? (
+          <SquadPitch frontend={frontend} backend={backend} tools={tools} />
         ) : (
           <p className="text-center text-sm text-text-secondary">
             Todavía no hay tecnologías cargadas. Se agregan desde el panel de administración.
