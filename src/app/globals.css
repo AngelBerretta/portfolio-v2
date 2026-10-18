@@ -34,8 +34,8 @@
   --color-accent-ghost: rgba(204, 255, 0, 0.13);
   --color-accent-text: #ccff00;
 
-  --color-border: #2e2e2e;
-  --color-border-subtle: #222222;
+  --color-border: #454545;
+  --color-border-subtle: #2c2c2c;
   --color-border-ghost: #1a1a1a;
   /* Contorno de controles de formulario (inputs): necesita ≥ 3:1 (WCAG 1.4.11).
      --color-border queda para separadores decorativos. */
@@ -45,25 +45,25 @@
   /* Antes secondary/muted estaban invertidos (muted era más claro). */
   --color-text-secondary: #b8b8b8;
   --color-text-muted: #999999;
-  --color-text-disabled: #333333;
+   --color-text-disabled: #5a5a5a;
   --color-text-inverse: #0a0a0a;
 
   /* ── Estados (fútbol) ────────────────────────────────── */
   --color-live: #ff3b3b;
   --color-live-bg: rgba(255, 59, 59, 0.07);
   --color-win: #22c55e;
-  --color-loss: #ef4444;
-  --color-draw: #52525b;
+  --color-loss: #f87171;
+  --color-draw: #a1a1aa;
 
   /* ── Posiciones de tabla ─────────────────────────────── */
-  --color-pos-champions: #3b82f6;
+  --color-pos-champions: #60a5fa;
   --color-pos-continental: #06b6d4;
   --color-pos-playoff: #f59e0b;
   --color-pos-repechaje: #eab308;
   --color-pos-champions-playoff: #a78bfa; /* era #8b5cf6 (4.35:1) */
   --color-pos-continental-playoff: #ec4899;
   --color-pos-relegation-playoff: #ea580c;
-  --color-pos-relegation: #ef4444;
+  --color-pos-relegation: #f87171;
 }
 
 /* ================================================================
