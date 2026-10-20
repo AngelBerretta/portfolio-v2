@@ -38,7 +38,11 @@ export function SkillIcon({
         unoptimized
         loading="eager"
         fetchPriority="low"
-        className={cn('h-5 w-5 object-contain', skill.invertIcon && 'invert', className)}
+        className={cn(
+          'h-5 w-5 object-contain drop-shadow-[0_0_1px_rgb(255_255_255/0.7)]',
+          skill.invertIcon && 'invert',
+          className
+        )}
       />
     );
   }
